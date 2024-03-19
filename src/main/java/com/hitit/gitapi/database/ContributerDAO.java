@@ -40,4 +40,10 @@ public class ContributerDAO {
         entityManager.remove(entityManager.contains(contributor) ? contributor : entityManager.merge(contributor));
         transaction.commit();
     }
+
+    public ContributorEntity findContributorByUsername(String username) {
+        return entityManager.createQuery("SELECT c FROM ContributorEntity c WHERE c.username = :username", ContributorEntity.class)
+                .setParameter("username", username)
+                .getSingleResult();
+    }
 }

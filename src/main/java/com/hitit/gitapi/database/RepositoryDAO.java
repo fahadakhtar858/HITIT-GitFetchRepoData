@@ -37,5 +37,10 @@ public class RepositoryDAO {
         entityManager.remove(entityManager.contains(repository)?repository:entityManager.merge(repository));
         transaction.commit();
     }
+    public RepositoryEntity findRepositoryByName(String name) {
+        return entityManager.createQuery("SELECT r FROM RepositoryEntity r WHERE r.name = :name", RepositoryEntity.class)
+                .setParameter("name", name)
+                .getSingleResult();
+    }
 
 }

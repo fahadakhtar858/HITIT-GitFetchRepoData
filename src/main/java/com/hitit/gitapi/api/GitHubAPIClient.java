@@ -11,6 +11,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class GitHubAPIClient {
+    private static final Logger logger = LoggerFactory.getLogger(GitHubAPIClient.class);
     private static HashMap<String, ArrayList<ContributorEntity>> map = new HashMap<>();
     private static ArrayList<String> repoNameList = new ArrayList<>();
     private static ArrayList<String> contributorURLList = new ArrayList<>();
@@ -48,22 +51,19 @@ public class GitHubAPIClient {
                 String contibutorURL = repo.getString("contributors_url");
                 contributorURLList.add(contibutorURL);
                 int n = i + 1;
-                System.out.println("Repository No " + n + " :");
-                System.out.println("Repo Name:");
-                System.out.println(repoName);
-                System.out.println("Contibutor List");
+
+                logger.info("Repository No {}: ", n);
+                logger.info("Repo Name: {}", repoName);
+                logger.info("Contributor List");
                 map.put(repoName, fetchTopContributors(contibutorURL, token, repoName));
 
             }
 
         }else {
-            System.err.println("Failed to fetch user data. Status code: " + response.getStatusLine().getStatusCode());
+            logger.error("Failed to fetch user data. Status code: {}", response.getStatusLine().getStatusCode());
         }
         client.close();
         return map;
-
-
-
         }
 
     private static ArrayList<ContributorEntity> fetchTopContributors(String contibutorURL, String token, String repoName) throws IOException, InterruptedException {
@@ -101,11 +101,11 @@ public class GitHubAPIClient {
             ContributorEntity entity = getDetails(detailUrl, token, repoName,contributions, ent);
             contributorList.add(entity);
             int a = i+1;
-            System.out.println("Contributer "+a+" :");
-            System.out.println("Username :"+entity.getUsername());
-            System.out.println("Company :"+entity.getCompany());
-            System.out.println("Location :"+entity.getLocation());
-            System.out.println("Contributions :"+entity.getContributions());
+            logger.info("Contributor {}: ", a);
+            logger.info("Username: {}", entity.getUsername());
+            logger.info("Company: {}", entity.getCompany());
+            logger.info("Location: {}", entity.getLocation());
+            logger.info("Contributions: {}", entity.getContributions());
 
         }
         connection.disconnect();

@@ -8,6 +8,8 @@ import com.hitit.gitapi.models.RepositoryEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.io.IOException;
@@ -16,11 +18,12 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Main {
-    private static int requestCounter = 0;
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
 
     public static void main( String[] args )
     {
+
         String usernameGit = "fahadakhtar858";
         String token01 = "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";
         String orgnization = "apache";
@@ -30,22 +33,10 @@ public class Main {
         try {
             map = apiClient.getRepo(token01,orgnization);
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            logger.error("Error occurred while fetching GitHub data: {}", e.getMessage());
             throw new RuntimeException(e);
 
         }
-
-            /* Demo Insertions.
-            ArrayList<ContributorEntity>arr = new ArrayList<>();
-            RepositoryEntity ent01 = new RepositoryEntity("echarts");
-            ContributorEntity test01 = new ContributorEntity("pissang", "Shanghai, China", "null",3156, ent01);
-            ContributorEntity test02 = new ContributorEntity("Fahad", "Lahore, Pakistan", "Abacus",2000, ent01);
-            arr.add(test01);
-            arr.add(test02);
-
-
-        map.put(ent01.getName(),arr);
-        Demo Insertions End here.*/
 
         //Data Insertion
             EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("git-api");
@@ -65,15 +56,16 @@ public class Main {
                         contributerDAO.saveContributor(ent);
                     }
                 }
-                System.out.println("Data Inserted Successfully");
+                logger.info("Data Inserted Successfully");
 
                 List<ContributorEntity> list = contributerDAO.findAllContributors();
 
                 for(ContributorEntity obj:list){
-                    System.out.println("ID:"+obj.getId()+", Repo:"+obj.getRepository().getName()+", Username:"+obj.getUsername()
-                    +", Location:"+obj.getLocation()+", Company:"+obj.getCompany()+", Contributions:"+obj.getContributions());
+                    logger.info("ID: {}, Repo: {}, Username: {}, Location: {}, Company: {}, Contributions: {}",
+                            obj.getId(), obj.getRepository().getName(), obj.getUsername(), obj.getLocation(), obj.getCompany(), obj.getContributions());
                 }
             }catch(Exception e) {
+                logger.error("Error occurred: {}", e.getMessage());
                 e.printStackTrace();
             }finally {
                 // Close EntityManager and EntityManagerFactory
